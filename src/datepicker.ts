@@ -484,6 +484,9 @@ export class Datepicker extends LitElement {
   public disabledDates: string = '';
 
   @property({ type: String })
+  public highlightedDates: string = '';
+
+  @property({ type: String })
   public weekLabel: string = 'Wk';
 
   @property({ type: Boolean })
@@ -803,6 +806,12 @@ export class Datepicker extends LitElement {
     } = this._formatters;
     const disabledDays = splitString(this.disabledDays, Number);
     const disabledDates = splitString(this.disabledDates, getResolvedDate);
+    const highlightedDatesFull = splitString(this.highlightedDates, getResolvedDate);
+    const highlightedDates = [];
+    highlightedDatesFull.forEach((date,i) => {
+      highlightedDates.push(date.getUTCFullYear() + '-' + date.getUTCMonth() + '-' + date.getUTCDate());
+    });
+
     const showWeekNumber = this.showWeekNumber;
     const $focusedDate = this._focusedDate;
     const firstDayOfWeek = this.firstDayOfWeek;
@@ -832,15 +841,16 @@ export class Datepicker extends LitElement {
     const hasMaxDate = !calendars[2].calendar.length;
 
     const weekdaysContent = weekdays.map(
-      o => html`<th
-        class="calendar-weekday"
-        part="calendar-weekday"
-        role="columnheader"
-        aria-label="${o.label}"
-      >
-        <div class="weekday" part="weekday">${o.value}</div>
-      </th>`
-    );
+      o => {
+        return html`<th
+          class="calendar-weekday"
+          part="calendar-weekday"
+          role="columnheader"
+          aria-label="${o.label}"
+        >
+          <div class="weekday" part="weekday">${o.value}</div>
+        </th>`
+    });
     const calendarsContent = repeat(calendars, n => n.key, ({ calendar }, ci) => {
       if (!calendar.length) {
         return html`<div class="calendar-container" part="calendar"></div>`;
@@ -903,6 +913,10 @@ export class Datepicker extends LitElement {
                   const isCurrentDate = +$focusedDate === curTime;
                   const shouldTab = isMidCalendar && $newFocusedDate.getUTCDate() === Number(value);
 
+                  const formattedDate = fullDate.getUTCFullYear() + '-' + fullDate.getUTCMonth() + '-' + fullDate.getUTCDate();
+
+                  const isHighlightedDay = highlightedDates.includes(formattedDate);
+
                   return html`
                   <td
                     tabindex="${shouldTab ? '0' : '-1'}"
@@ -910,10 +924,11 @@ export class Datepicker extends LitElement {
                       'full-calendar__day': true,
                       'day--disabled': disabled,
                       'day--today': +todayDate === curTime,
-                      'day--focused': !disabled && isCurrentDate,
+                      'day--focused': !disabled && isCurrentDate
                     })}"
                     part="calendar-day"
                     role="gridcell"
+                    is-highlighted-day="${isHighlightedDay ? 'true' : 'false'}"
                     aria-disabled="${disabled ? 'true' : 'false'}"
                     aria-label="${label}"
                     aria-selected="${isCurrentDate ? 'true' : 'false'}"
