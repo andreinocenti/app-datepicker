@@ -807,9 +807,11 @@ export class Datepicker extends LitElement {
     const disabledDays = splitString(this.disabledDays, Number);
     const disabledDates = splitString(this.disabledDates, getResolvedDate);
     const highlightedDatesFull = splitString(this.highlightedDates, getResolvedDate);
-    const highlightedDates = [];
-    highlightedDatesFull.forEach((date,i) => {
-      highlightedDates.push(date.getUTCFullYear() + '-' + date.getUTCMonth() + '-' + date.getUTCDate());
+    const highlightedDates:string[] = [];
+    highlightedDatesFull.forEach((date) => {
+      highlightedDates.push(
+        `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
+       );
     });
 
     const showWeekNumber = this.showWeekNumber;
@@ -841,7 +843,7 @@ export class Datepicker extends LitElement {
     const hasMaxDate = !calendars[2].calendar.length;
 
     const weekdaysContent = weekdays.map(
-      o => {
+      (o) => {
         return html`<th
           class="calendar-weekday"
           part="calendar-weekday"
@@ -849,8 +851,9 @@ export class Datepicker extends LitElement {
           aria-label="${o.label}"
         >
           <div class="weekday" part="weekday">${o.value}</div>
-        </th>`
-    });
+        </th>`;
+      }
+    );
     const calendarsContent = repeat(calendars, n => n.key, ({ calendar }, ci) => {
       if (!calendar.length) {
         return html`<div class="calendar-container" part="calendar"></div>`;
@@ -913,7 +916,7 @@ export class Datepicker extends LitElement {
                   const isCurrentDate = +$focusedDate === curTime;
                   const shouldTab = isMidCalendar && $newFocusedDate.getUTCDate() === Number(value);
 
-                  const formattedDate = fullDate.getUTCFullYear() + '-' + fullDate.getUTCMonth() + '-' + fullDate.getUTCDate();
+                  const formattedDate = `${fullDate.getUTCFullYear()}-${fullDate.getUTCMonth()}-${fullDate.getUTCDate()}`;
 
                   const isHighlightedDay = highlightedDates.includes(formattedDate);
 
@@ -924,7 +927,7 @@ export class Datepicker extends LitElement {
                       'full-calendar__day': true,
                       'day--disabled': disabled,
                       'day--today': +todayDate === curTime,
-                      'day--focused': !disabled && isCurrentDate
+                      'day--focused': !disabled && isCurrentDate,
                     })}"
                     part="calendar-day"
                     role="gridcell"
